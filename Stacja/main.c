@@ -7,6 +7,7 @@
 
 //dolaczania naglowek
 #include <avr/io.h>
+#include <stdio.h>
 
 //zmienne globalne
 
@@ -27,3 +28,4 @@ int main(void){
 	return 0;
 }
 
+//funkcje odpowiedzialne za RTC
