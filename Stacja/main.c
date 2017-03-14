@@ -14,12 +14,14 @@
 int main(void){
 
 	//inicjalizacja sprzetu
-
+	int i = 0;
 
 
 	//petla nieskonczona
 	while(1){
-
+		if(i<10){
+			printf("siema");
+		}
 	}
 
 	return 0;
