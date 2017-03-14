@@ -39,3 +39,13 @@
 *.project
 .metadata/.plugins/org.eclipse.epp.logging.aeri.ide/org.eclipse.epp.logging.aeri.ide.server/local-history/_0.tis
 .metadata/.plugins/org.eclipse.epp.logging.aeri.ide/org.eclipse.epp.logging.aeri.ide.server/local-history/segments_1
+.metadata/.plugins/org.eclipse.core.resources/.history/a2/60f936eec10800171061ec456dea7a60
+*.xmi
+.metadata/.plugins/org.eclipse.ltk.core.refactoring/.refactorings/.workspace/2017/3/11/refactorings.history
+Stacja/.cproject
+*.d
+Stacja/Debug/main.o
+Stacja/Debug/objects.mk
+*.mk
+Stacja/Debug/Stacja.map
+Stacja/Debug/Stacja.elf
