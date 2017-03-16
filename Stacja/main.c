@@ -8,6 +8,7 @@
 //dolaczania naglowek
 #include <avr/io.h>
 #include <stdio.h>
+#include <util/delay.h>
 
 //zmienne globalne
 
@@ -15,14 +16,16 @@
 int main(void){
 
 	//inicjalizacja sprzetu
-	int i = 0;
-
+	//int i = 0;
+	DDRA |= (1 << PA0);
+	PORTA &= ~(1 << PA0);
 
 	//petla nieskonczona
 	while(1){
-		if(i<10){
-			printf("siema");
-		}
+		PORTA |= (1 << PA0);
+		_delay_ms(1000);
+		PORTA &= ~(1 << PA0);
+		_delay_ms(1000);
 	}
 
 	return 0;
