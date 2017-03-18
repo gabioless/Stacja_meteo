@@ -8,6 +8,7 @@ RM := rm -rf
 
 # All of the sources participating in the build are defined here
 -include sources.mk
+-include lcdlibrary/subdir.mk
 -include subdir.mk
 -include objects.mk
 
@@ -43,7 +44,7 @@ all: Stacja.elf secondary-outputs
 Stacja.elf: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: AVR C Linker'
-	avr-gcc -Wl,-Map,Stacja.map -mmcu=atmega324p -o "Stacja.elf" $(OBJS) $(USER_OBJS) $(LIBS)
+	avr-gcc -Wl,-Map,Stacja.map -mmcu=atmega644p -o "Stacja.elf" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
@@ -55,7 +56,7 @@ Stacja.lss: Stacja.elf
 
 sizedummy: Stacja.elf
 	@echo 'Invoking: Print Size'
-	-avr-size --format=avr --mcu=atmega324p Stacja.elf
+	-avr-size --format=avr --mcu=atmega644p Stacja.elf
 	@echo 'Finished building: $@'
 	@echo ' '
 
