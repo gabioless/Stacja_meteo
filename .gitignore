@@ -31,17 +31,10 @@
 *.json
 .metadata/.plugins/org.eclipse.oomph.setup/workspace.setup
 *.log
-.metadata/.plugins/org.eclipse.rse.core/initializerMarks/org.eclipse.rse.internal.core.RSELocalConnectionInitializer.mark
 *.properties
-.metadata/.plugins/org.eclipse.ui.intro/introstate
 *.xml
-.metadata/version.ini
 *.project
-.metadata/.plugins/org.eclipse.epp.logging.aeri.ide/org.eclipse.epp.logging.aeri.ide.server/local-history/_0.tis
-.metadata/.plugins/org.eclipse.epp.logging.aeri.ide/org.eclipse.epp.logging.aeri.ide.server/local-history/segments_1
-.metadata/.plugins/org.eclipse.core.resources/.history/a2/60f936eec10800171061ec456dea7a60
 *.xmi
-.metadata/.plugins/org.eclipse.ltk.core.refactoring/.refactorings/.workspace/2017/3/11/refactorings.history
 Stacja/.cproject
 *.d
 Stacja/Debug/main.o
@@ -49,10 +42,9 @@ Stacja/Debug/objects.mk
 *.mk
 Stacja/Debug/Stacja.map
 Stacja/Debug/Stacja.elf
-.metadata/.plugins/org.eclipse.core.resources/.history/8b/6047f55ec20800171061ec456dea7a60
-.metadata/.plugins/org.eclipse.core.resources/.history/2b/70072ceec20800171061ec456dea7a60
-\.metadata/\.plugins/org\.eclipse\.core\.resources/\.history/20/3066ec2ffe0b001710f390728c62f7f4
+
 \.metadata/
+
 Stacja/lcdlibrary/doxygen\.css
 
 Stacja/lcdlibrary/doxygen\.png
