@@ -1,3 +1,4 @@
+
 \.metadata/
 \Debug/
 *.lock
@@ -30,3 +31,5 @@ Stacja/lcdlibrary/doxygen\.png
 Stacja/lcdlibrary/group__pfleury__lcd\.html
 
 Stacja/\.settings/
+
+
