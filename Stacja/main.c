@@ -8,12 +8,22 @@
 //dolaczania naglowek
 #include <avr/io.h>
 #include <stdio.h>
-#include <util/delay.h>
-
-//biblioteka lcd
-#include "lcdlibrary/lcd.h"
+#include <util/delay.h>						//biblioteka opoznien
+#include <avr/interrupt.h>					//biblioteka przerwan
+#include "lcdlibrary/lcd.h"					//biblioteka lcd
+#include "rtc_pcf8563/I2cbase.h" 			//bibliteka i2c
+#include "rtc_pcf8563/PCF8563.h"			//biblioteka RTC PCH8563
 
 //zmienne globalne
+volatile int licznik = 0;					//timer go uzywwa
+volatile uint8_t licznik2 = 0;				//petla while go uzywa
+char tekst[3]; 								//do wyswietlania
+
+Date data; //data do zapisania
+Time czas; //time do zapisania
+
+//funkcje
+void ini_Timer();
 
 //funckja glowna
 int main(void){
@@ -22,28 +32,58 @@ int main(void){
 	DDRA |= (1 << PA7);
 	PORTA &= ~(1 << PA7);
 
+	//inicjalizacja timera
+	ini_Timer();
+	sei();
+
+	//inicjalizacja RTC
+	I2C_Init();
+	data.Year=bin2bcd(10);
+	data.Month=bin2bcd(1);
+	data.Day=bin2bcd(19);
+
+	czas.Second=bin2bcd(0);
+	czas.Minute=bin2bcd(0);
+	czas.Hour=bin2bcd(23);
+
+	/*
+	if(!PCF8563_IsDataValid()){
+		PCF8563_SetTime(&czas);
+		PCF8563_SetDate(&data);
+	}
+	*/
+
 	//lcd inicjalizacja
 	lcd_init(LCD_DISP_ON);
-
 	lcd_clrscr();
 
-	lcd_puts("LCD Test Line 1\n");
-
-	//petla nieskonczona
 	while(1){
-		PORTA |= (1 << PA7);
-		lcd_clrscr();
-		lcd_puts("Test 1\n");
-		_delay_ms(1000);
-		PORTA &= ~(1 << PA7);
-		lcd_clrscr();
-		lcd_puts("Test 2\n");
-		_delay_ms(1000);
-
+		if(licznik2 >= 100){
+			lcd_clrscr();
+			PCF8563_GetTime(&czas);
+			bcd2ASCII(czas.Second, tekst);
+			tekst[2] = 0;
+			lcd_puts(tekst);
+			licznik2 = 0;
+		}
 	}
-
 	return 0;
 }
 
-//funkcje odpowiedzialne za RTC
-// testowanie
+//inicjalizacja timera
+void ini_Timer(){
+	TCCR0A |= (1 << WGM01); 				//tryb CTC
+	TCCR0B |= (1 << CS02) | (1 << CS00); 	//preskaler 1024
+	TIMSK0 |= (1 << OCIE0A); 				//odblokowanie przerwania z trybu compare
+	OCR0A = 9;								//obliczone 100ms dla 1Mhz
+}
+
+//przerwanie dla timera0
+ISR(TIMER0_COMPA_vect){
+	licznik++;
+	licznik2++;
+	if(licznik >= 100){
+		PORTA ^= (1 << PA7);
+		licznik = 0;
+	}
+}
