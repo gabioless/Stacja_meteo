@@ -14,6 +14,7 @@
 #include "lcdlibrary/lcd.h"					//biblioteka lcd
 #include "rtc_pcf8563/I2cbase.h" 			//bibliteka i2c
 #include "rtc_pcf8563/PCF8563.h"			//biblioteka RTC PCH8563
+#include "1Wire/ds18x20.h"
 
 //zmienne globalne
 volatile int licznik = 0;					//timer go uzywwa
