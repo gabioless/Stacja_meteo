@@ -46,22 +46,22 @@ int main(void){
 	char buffer[3];
 
 	//PCF8563_WriteRegister(CntrlReg2, PCF_TimerInterruptEnabled);
-	PCF8563_WriteRegister(CLKUOUTFreqReg, 3); 		//init RTC
+	PCF8563_WriteRegister(CLKUOUTFreqReg, PCF_CLKOUTActivate | PCF_CLKOUT1Hz); 		//init RTC
 	//PCF8563_WriteRegister(TimerCntrlReg, PCF_TimerClk1Hz | PCF_TimeValid);
-	data.Year=bin2bcd(10);
-	data.Month=bin2bcd(1);
-	data.Day=bin2bcd(19);
+	data.Year=bin2bcd(17);
+	data.Month=bin2bcd(3);
+	data.Day=bin2bcd(20);
 
 	czas.Second=bin2bcd(0);
-	czas.Minute=bin2bcd(0);
-	czas.Hour=bin2bcd(23);
+	czas.Minute=bin2bcd(1);
+	czas.Hour=bin2bcd(19);
 
-	/*
+
 	if(!PCF8563_IsDataValid()){
 		PCF8563_SetTime(&czas);
 		PCF8563_SetDate(&data);
 	}
-	*/
+
 
 	//lcd inicjalizacja
 	lcd_init(LCD_DISP_ON);
