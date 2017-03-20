@@ -8,6 +8,7 @@
 //dolaczania naglowek
 #include <avr/io.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <util/delay.h>						//biblioteka opoznien
 #include <avr/interrupt.h>					//biblioteka przerwan
 #include "lcdlibrary/lcd.h"					//biblioteka lcd
@@ -25,6 +26,7 @@ Time czas; //time do zapisania
 //funkcje
 void ini_Timer();
 
+
 //funckja glowna
 int main(void){
 
@@ -38,6 +40,13 @@ int main(void){
 
 	//inicjalizacja RTC
 	I2C_Init();
+
+	//zmienne
+	char buffer[3];
+
+	//PCF8563_WriteRegister(CntrlReg2, PCF_TimerInterruptEnabled);
+	PCF8563_WriteRegister(CLKUOUTFreqReg, 3); 		//init RTC
+	//PCF8563_WriteRegister(TimerCntrlReg, PCF_TimerClk1Hz | PCF_TimeValid);
 	data.Year=bin2bcd(10);
 	data.Month=bin2bcd(1);
 	data.Day=bin2bcd(19);
@@ -55,14 +64,32 @@ int main(void){
 
 	//lcd inicjalizacja
 	lcd_init(LCD_DISP_ON);
+	int temp = 0;
+
+	temp = PCF8563_ReadRegister(CntrlReg2);
 	lcd_clrscr();
+	itoa(temp, buffer, 10);
+	lcd_gotoxy(0,1);
+
+	lcd_puts(buffer);
+	_delay_ms(2000);
+	if(temp == (128+3)){
+		lcd_puts("OK");
+		_delay_ms(2000);
+
+	}
 
 	while(1){
 		if(licznik2 >= 100){
 			lcd_clrscr();
 			PCF8563_GetTime(&czas);
+			bcd2ASCII(czas.Hour, tekst);
+			lcd_puts(tekst);
+			lcd_puts(":");
+			bcd2ASCII(czas.Minute, tekst);
+			lcd_puts(tekst);
+			lcd_puts(":");
 			bcd2ASCII(czas.Second, tekst);
-			tekst[2] = 0;
 			lcd_puts(tekst);
 			licznik2 = 0;
 		}
