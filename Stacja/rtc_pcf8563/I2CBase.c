@@ -5,7 +5,7 @@ uint8_t I2C_Error;
 
 void I2C_Init()
 {
-	TWCR =_BV(TWEA) | _BV(TWEN);		//W³¹cz interfejs I2C
+	TWCR =_BV(TWEA) | _BV(TWEN);		//Wï¿½ï¿½cz interfejs I2C
 	I2C_SetBusSpeed(I2CBUSCLOCK/100);
 }
 
@@ -57,7 +57,7 @@ void I2C_SetBusSpeed(uint16_t speed)
 {
 	speed=(F_CPU/speed/100-16)/2;		//speed=TWBR*4^TWPS
 	uint8_t prescaler=0;
-	while(speed>255)				//Oblicz wartoœæ preskalera
+	while(speed>255)				//Oblicz wartoï¿½ï¿½ preskalera
 	 {
 		prescaler++;
 		speed=speed/4;
@@ -72,4 +72,4 @@ void I2C_SendStartAndSelect(uint8_t addr)
 	I2C_SendAddr(addr);
 }
 
-void I2C_SetError(uint8_t err) { I2C_Error=err;}
+//void I2C_SetError(uint8_t err) { I2C_Error=err;}
