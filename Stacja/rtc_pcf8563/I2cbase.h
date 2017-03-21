@@ -12,7 +12,7 @@
 #define I2C_NoACK		4
 
 extern uint8_t I2C_Error;
-inline void I2C_SetError(uint8_t err);// { I2C_Error=err;};
+inline void I2C_SetError(uint8_t err) { I2C_Error=err;};
 
 void I2C_Init();
 void I2C_Start();

@@ -30,6 +30,12 @@ Stacja/lcdlibrary/doxygen\.css
 Stacja/lcdlibrary/doxygen\.png
 Stacja/lcdlibrary/group__pfleury__lcd\.html
 
+<<<<<<< Updated upstream
 Stacja/\.settings/
 
 
+=======
+Stacja/Debug/rtc_pcf8563/I2CBase\.o
+
+Stacja/Debug/rtc_pcf8563/PCF8563\.o
+>>>>>>> Stashed changes
