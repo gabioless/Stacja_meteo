@@ -20,12 +20,17 @@
 volatile int licznik = 0;					//timer go uzywwa
 volatile uint8_t licznik2 = 0;				//petla while go uzywa
 char tekst[3]; 								//do wyswietlania
+uint8_t subzero, cel, cel_fract_bits;       //do temp
 
 Date data; //data do zapisania
 Time czas; //time do zapisania
 
 //funkcje
 void ini_Timer();
+void lcd_int(int val);
+void DisplayTemp();
+void TakeMeasurement();
+
 
 
 //funckja glowna
@@ -53,8 +58,8 @@ int main(void){
 	data.Day=bin2bcd(20);
 
 	czas.Second=bin2bcd(0);
-	czas.Minute=bin2bcd(1);
-	czas.Hour=bin2bcd(19);
+	czas.Minute=bin2bcd(48);
+	czas.Hour=bin2bcd(20);
 
 
 	if(!PCF8563_IsDataValid()){
@@ -92,6 +97,7 @@ int main(void){
 			lcd_puts(":");
 			bcd2ASCII(czas.Second, tekst);
 			lcd_puts(tekst);
+			TakeMeasurement(); // tu wykona siê pomiar, odczyt i wyœwietlenie na lcd
 			licznik2 = 0;
 		}
 	}
@@ -115,3 +121,38 @@ ISR(TIMER0_COMPA_vect){
 		licznik = 0;
 	}
 }
+
+void DisplayTemp() {
+	lcd_gotoxy(0,1); // druga linia, pierwszy znak
+	lcd_puts("T: ");
+    if (subzero)
+    	lcd_puts("-");
+    else
+    	lcd_puts(" ");
+    lcd_int(cel);
+    lcd_puts(".");
+    lcd_int(cel_fract_bits);
+    lcd_puts("C ");
+}
+
+
+void lcd_int(int val)
+{
+	char bufor[17];
+	lcd_puts( itoa(val, bufor, 10) );
+}
+
+
+void TakeMeasurement() {
+    search_sensors();
+    DS18X20_start_meas(DS18X20_POWER_EXTERN, NULL);
+
+    _delay_ms(750);
+    if (DS18X20_OK == DS18X20_read_meas(gSensorIDs[0], &subzero, &cel, &cel_fract_bits))
+        DisplayTemp();
+    else {
+    	lcd_gotoxy(0,1);
+        lcd_puts(" error \n\r");    /* wyœwietlamy informacjê o b³êdzie jeœli np brak czujnika lub b³¹d odczytu */
+    }
+}
+

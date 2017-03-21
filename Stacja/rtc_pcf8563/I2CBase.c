@@ -71,3 +71,5 @@ void I2C_SendStartAndSelect(uint8_t addr)
 	I2C_Start();
 	I2C_SendAddr(addr);
 }
+
+void I2C_SetError(uint8_t err) { I2C_Error=err;}
