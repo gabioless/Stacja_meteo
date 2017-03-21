@@ -50,11 +50,11 @@ int main(void){
 	//PCF8563_WriteRegister(TimerCntrlReg, PCF_TimerClk1Hz | PCF_TimeValid);
 	data.Year=bin2bcd(17);
 	data.Month=bin2bcd(3);
-	data.Day=bin2bcd(20);
+	data.Day=bin2bcd(21);
 
 	czas.Second=bin2bcd(0);
-	czas.Minute=bin2bcd(48);
-	czas.Hour=bin2bcd(20);
+	czas.Minute=bin2bcd(38);
+	czas.Hour=bin2bcd(18);
 
 
 	if(!PCF8563_IsDataValid()){
@@ -79,10 +79,10 @@ int main(void){
 		_delay_ms(2000);
 
 	}
-
+	lcd_clrscr();
 	while(1){
 		if(licznik2 >= 100){
-			lcd_clrscr();
+			lcd_gotoxy(0,0);
 			PCF8563_GetTime(&czas);
 			bcd2ASCII(czas.Hour, tekst);
 			lcd_puts(tekst);
