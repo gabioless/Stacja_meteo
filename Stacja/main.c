@@ -53,8 +53,8 @@ int main(void){
 	data.Day=bin2bcd(20);
 
 	czas.Second=bin2bcd(0);
-	czas.Minute=bin2bcd(1);
-	czas.Hour=bin2bcd(19);
+	czas.Minute=bin2bcd(48);
+	czas.Hour=bin2bcd(20);
 
 
 	if(!PCF8563_IsDataValid()){
