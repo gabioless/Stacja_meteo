@@ -9,6 +9,7 @@
 #include <avr/io.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <util/delay.h>						//biblioteka opoznien
 #include <avr/interrupt.h>					//biblioteka przerwan
 #include "lcdlibrary/lcd.h"					//biblioteka lcd
@@ -16,6 +17,7 @@
 #include "rtc_pcf8563/PCF8563.h"			//biblioteka RTC PCH8563
 #include "1Wire/ds18x20.h"
 #include "dht/dht.h"
+#include "MK_USART/mkuart.h"
 
 #define STALA 3.14 							//obwod wiatromierza
 
@@ -27,6 +29,7 @@ uint8_t subzero, cel, cel_fract_bits;       //do temp
 volatile uint16_t enkoder = 10545;
 volatile uint16_t liczba = 0;
 volatile uint16_t obroty = 0;
+char buff[256];
 
 Date data; //data do zapisania
 Time czas; //time do zapisania
@@ -38,6 +41,7 @@ void DisplayTemp();
 void TakeMeasurement();
 void ini_enkoder();
 void iniTimer16bit();
+void Parse(char *buff );
 
 #if DHT_FLOAT == 0
 	int8_t temperature = 0;
@@ -83,10 +87,18 @@ int main(void){
 
 	search_sensors();
 
+	USART_Init( __UBRR );
+	register_uart_str_rx_event_callback(Parse);
+
+
 	_delay_ms(2000);
 
 	while(1){
-		if(licznik2 >= 10){
+
+		UART_RX_STR_EVENT( buff );
+
+		if(licznik2 >= 100){
+			//uart_putc('a');
 			PCF8563_GetTime(&czas);
 			lcd_gotoxy(0,0);
 			bcd2ASCII(czas.Hour, tekst);
@@ -168,6 +180,23 @@ void TakeMeasurement() {
 	}
 }
 
+void Parse(char *buff )
+{
+	//uart_putc('a');
+	if(!strncmp("Date: ", buff,6))
+	{
+		PORTA ^= (1 << PA7);
+		uart_putc('a');
+		uart_putc('\n');
+	}
+	else{
+		uart_putc('b');
+		uart_putc('\n');
+	}
+
+
+}
+
 void ini_enkoder(){
 	EICRA |= (1 << ISC01);
 	EIMSK |= (1 << INT0);
@@ -196,7 +225,7 @@ void ini_Timer(){
 	TCCR0A |= (1 << WGM01); 				//tryb CTC
 	TCCR0B |= (1 << CS02) | (1 << CS00); 	//preskaler 1024
 	TIMSK0 |= (1 << OCIE0A); 				//odblokowanie przerwania z trybu compare
-	OCR0A = 97;								//obliczone 100ms dla 1Mhz
+	OCR0A = 255;								//obliczone 100ms dla 1Mhz
 }
 
 //przerwanie dla timera0
@@ -204,7 +233,7 @@ ISR(TIMER0_COMPA_vect){
 	licznik++;
 	licznik2++;
 	if(licznik >= 10){
-		PORTA ^= (1 << PA7);
+		//PORTA ^= (1 << PA7);
 		licznik = 0;
 	}
 }
