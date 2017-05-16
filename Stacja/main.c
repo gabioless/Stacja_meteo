@@ -30,6 +30,8 @@ volatile uint16_t enkoder = 10545;
 volatile uint16_t liczba = 0;
 volatile uint16_t obroty = 0;
 char buff[256];
+char buffTMP[26];
+int h,m,s;
 
 Date data; //data do zapisania
 Time czas; //time do zapisania
@@ -42,6 +44,9 @@ void TakeMeasurement();
 void ini_enkoder();
 void iniTimer16bit();
 void Parse(char *buff );
+void GetDate();
+void SendAt(char* command);
+void ini_esp8266();
 
 #if DHT_FLOAT == 0
 	int8_t temperature = 0;
@@ -79,6 +84,7 @@ int main(void){
 	czas.Minute=bin2bcd(44);
 	czas.Hour=bin2bcd(14);
 
+	PCF8563_SetTime(&czas);
 
 	if(!PCF8563_IsDataValid()){
 		PCF8563_SetTime(&czas);
@@ -90,15 +96,19 @@ int main(void){
 	USART_Init( __UBRR );
 	register_uart_str_rx_event_callback(Parse);
 
+	//ini_esp8266();
 
 	_delay_ms(2000);
+
+
+
 
 	while(1){
 
 		UART_RX_STR_EVENT( buff );
 
-		if(licznik2 >= 100){
-			//uart_putc('a');
+		if(licznik2 >= 150){
+			SendAt("AT+CIPSTART=\"TCP\",\"www.onet.pl\",80");
 			PCF8563_GetTime(&czas);
 			lcd_gotoxy(0,0);
 			bcd2ASCII(czas.Hour, tekst);
@@ -131,10 +141,11 @@ int main(void){
 						#endif
 						//uart_puts("humidity: "); uart_puts(printbuff); uart_puts("%RH");uart_puts("\r\n");
 
-					} else {
+					}
+			/*else {
 						lcd_gotoxy(10,0);
 						lcd_puts("error");
-					}
+					}*/
 		}
 	}
 	return 0;
@@ -171,7 +182,7 @@ void TakeMeasurement() {
 			DisplayTemp();
 		else {
 		    lcd_gotoxy(0,1);
-		    lcd_puts(" error \n\r");    /* wy�wietlamy informacj� o b��dzie je�li np brak czujnika lub b��d odczytu */
+		    lcd_puts("error    ");    /* wy�wietlamy informacj� o b��dzie je�li np brak czujnika lub b��d odczytu */
 		}
 	}
 	DS_licznik++;
@@ -180,20 +191,105 @@ void TakeMeasurement() {
 	}
 }
 
+void ini_esp8266(){
+
+	uart_puts("AT+CWJAP=\"p205a\",\"426312638\"\r\n");
+	//uart_puts("at\r\n");
+
+}
+
 void Parse(char *buff )
 {
-	//uart_putc('a');
+	if(!strncmp("CONNECT", buff,7) || !strncmp("ALREADY CONNECTED", buff, 17))
+	{
+		SendAt("AT+CIPSEND=1");
+		_delay_ms(250);
+		SendAt("a");
+	}
+
+	/*if(!strncmp("OK\n> ", buff, 5))
+	{
+		SendAt("a");
+		//uart_putc('a');
+		//uart_putc('\r');
+		//uart_putc('\n');
+	}*/
+
 	if(!strncmp("Date: ", buff,6))
 	{
 		PORTA ^= (1 << PA7);
-		uart_putc('a');
-		uart_putc('\n');
-	}
-	else{
-		uart_putc('b');
-		uart_putc('\n');
+		GetDate();
 	}
 
+	/*if(!strncmp("ALREADY CONNECTED", buff, 5))
+	{
+		SendAt("AT+CIPCLOSE");
+		_delay_ms(250);
+		SendAt("AT+CIPSTART=\"TCP\",\"www.onet.pl\",80");
+	}*/
+
+
+}
+
+void SendAt(char* command)
+{
+	uart_puts(command);
+	uart_putc('\r');
+	uart_putc('\n');
+}
+
+void GetDate()
+{
+
+	uart_putc('\n');
+	for(int i = 5; i < 255; i++)
+	{
+		if(buff[i-5] == 'D' && buff[i-4] == 'a' && buff[i-3] == 't' && buff[i-2] == 'e' && buff[i-1] == ':' )
+		{
+			for(int j = 0; j < 26; j++)
+			{
+				buffTMP[j] = buff[i+j];
+			}
+			break;
+		}
+	}
+
+	char tmp[3];
+	uart_putc('\n');
+	tmp[0] = buffTMP[18];
+	tmp[1] = buffTMP[19];
+	tmp[2] = '\n';
+
+	h = atoi(tmp);
+	h += 2;
+	h = h % 24;
+
+	tmp[0] = buffTMP[21];
+	tmp[1] = buffTMP[22];
+	tmp[2] = '\n';
+
+	m = atoi(tmp);
+
+
+	tmp[0] = buffTMP[24];
+	tmp[1] = buffTMP[25];
+	tmp[2] = '\n';
+
+	s = atoi(tmp);
+
+
+
+	//uart_putint(h,10);
+	//uart_putc(':');
+	//uart_putint(m,10);
+	//uart_putc(':');
+	//uart_putint(s,10);
+
+	czas.Second=bin2bcd(s);
+	czas.Minute=bin2bcd(m);
+	czas.Hour=bin2bcd(h);
+
+	PCF8563_SetTime(&czas);
 
 }
 
