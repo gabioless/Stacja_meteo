@@ -95,6 +95,7 @@ int main(void){
 
 	USART_Init( __UBRR );
 	register_uart_str_rx_event_callback(Parse);
+	uart_puts("AT+CWJAP=\"p205a\",\"426312638\"\r\n");
 
 	//ini_esp8266();
 

@@ -39,3 +39,23 @@ Stacja/Debug/rtc_pcf8563/I2CBase\.o
 
 Stacja/Debug/rtc_pcf8563/PCF8563\.o
 >>>>>>> Stashed changes
+
+test/\.cproject
+
+test_test/\.cproject
+
+*.prefs
+
+*.o
+
+WebServer/Release/makefile
+
+*.eep
+
+*.elf
+
+*.hex
+
+*.lss
+
+*.map
