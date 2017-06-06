@@ -31,8 +31,7 @@ int main( void )
 	USART_Init( __UBRR );
 	//register_uart_str_rx_event_callback( ParseRS232 ); //zarejestrowanie zdarzenia
 
-	//uart_puts("at\r\n");
-	//uart_putc('a');
+
 
 	DDRA |= (1 << PA7);
 	PORTA &= ~(1 << PA7);
@@ -69,7 +68,7 @@ void ParseRS232( char* buff )
 		PORTA ^= (1<<PA7);
 	}
 
-	for(int i = 3; i < 512; i++)
+	/*for(int i = 3; i < 512; i++)
 		{
 			if(buff[i-3] == 'G' && buff[i-2] == 'E' && buff[i-1] == 'T' )
 			{
@@ -77,7 +76,7 @@ void ParseRS232( char* buff )
 				SendHTMLCode();
 				break;
 			}
-		}
+		}*/
 }
 
 void SendHTMLCode( void )

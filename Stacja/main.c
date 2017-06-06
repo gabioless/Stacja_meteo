@@ -29,9 +29,10 @@ uint8_t subzero, cel, cel_fract_bits;       //do temp
 volatile uint16_t enkoder = 10545;
 volatile uint16_t liczba = 0;
 volatile uint16_t obroty = 0;
-char buff[256];
+char buff[512];
 char buffTMP[26];
 int h,m,s;
+int counter = 0;
 
 Date data; //data do zapisania
 Time czas; //time do zapisania
@@ -47,6 +48,8 @@ void Parse(char *buff );
 void GetDate();
 void SendAt(char* command);
 void ini_esp8266();
+void SendPageBody( void );
+void SendHTMLCode( void );
 
 #if DHT_FLOAT == 0
 	int8_t temperature = 0;
@@ -95,7 +98,7 @@ int main(void){
 
 	USART_Init( __UBRR );
 	register_uart_str_rx_event_callback(Parse);
-	uart_puts("AT+CWJAP=\"p205a\",\"426312638\"\r\n");
+	//uart_puts("AT+CWJAP=\"p205a\",\"426312638\"\r\n");
 
 	//ini_esp8266();
 
@@ -105,11 +108,37 @@ int main(void){
 
 
 	while(1){
-
 		UART_RX_STR_EVENT( buff );
 
+		//---------------------------------------------------------------
+		for(int i = 3; i < 512; i++)
+					{
+						if(buff[i-3] == 'G' && buff[i-2] == 'E' && buff[i-1] == 'T' )
+						{
+							PORTA ^= (1<<PA7);
+							SendHTMLCode();
+							break;
+						}
+					}
+		//---------------------------------------------------------------
 		if(licznik2 >= 150){
+			SendAt("AT+CIPSERVER=0");
+			_delay_ms(50);
+			SendAt("AT+CIPMUX=0");
+			_delay_ms(50);
 			SendAt("AT+CIPSTART=\"TCP\",\"www.onet.pl\",80");
+			_delay_ms(200);
+			SendAt("AT+CIPSEND=4");
+			_delay_ms(25);
+			SendAt("aa");
+			_delay_ms(100);
+			//GetDate();
+			//SendAt("AT+CIPCLOSE");
+			_delay_ms(50);
+			SendAt("AT+CIPMUX=1");
+			_delay_ms(50);
+			SendAt("AT+CIPSERVER=1,80");
+			_delay_ms(50);
 			PCF8563_GetTime(&czas);
 			lcd_gotoxy(0,0);
 			bcd2ASCII(czas.Hour, tekst);
@@ -143,11 +172,14 @@ int main(void){
 						//uart_puts("humidity: "); uart_puts(printbuff); uart_puts("%RH");uart_puts("\r\n");
 
 					}
-			/*else {
+
+			else {
 						lcd_gotoxy(10,0);
 						lcd_puts("error");
-					}*/
+					}
 		}
+		//-----------------
+
 	}
 	return 0;
 }
@@ -215,11 +247,10 @@ void Parse(char *buff )
 		//uart_putc('\r');
 		//uart_putc('\n');
 	}*/
-
 	if(!strncmp("Date: ", buff,6))
 	{
 		PORTA ^= (1 << PA7);
-		GetDate();
+		//GetDate();
 	}
 
 	/*if(!strncmp("ALREADY CONNECTED", buff, 5))
@@ -228,6 +259,16 @@ void Parse(char *buff )
 		_delay_ms(250);
 		SendAt("AT+CIPSTART=\"TCP\",\"www.onet.pl\",80");
 	}*/
+
+	for(int i = 3; i < 512; i++)
+			{
+				if(buff[i-3] == 'G' && buff[i-2] == 'E' && buff[i-1] == 'T' )
+				{
+					//PORTA ^= (1<<PA7);
+					SendHTMLCode();
+					break;
+				}
+			}
 
 
 }
@@ -242,21 +283,21 @@ void SendAt(char* command)
 void GetDate()
 {
 
-	uart_putc('\n');
-	for(int i = 5; i < 255; i++)
-	{
-		if(buff[i-5] == 'D' && buff[i-4] == 'a' && buff[i-3] == 't' && buff[i-2] == 'e' && buff[i-1] == ':' )
+	//uart_putc('\n');
+	for(int i = 5; i < 512; i++)
 		{
-			for(int j = 0; j < 26; j++)
+			if(buff[i-5] == 'D' && buff[i-4] == 'a' && buff[i-3] == 't' && buff[i-2] == 'e' && buff[i-1] == ':' )
 			{
-				buffTMP[j] = buff[i+j];
+				for(int j = 0; j < 26; j++)
+				{
+					buffTMP[j] = buff[i+j];
+				}
+				break;
 			}
-			break;
 		}
-	}
 
 	char tmp[3];
-	uart_putc('\n');
+	//uart_putc('\n');
 	tmp[0] = buffTMP[18];
 	tmp[1] = buffTMP[19];
 	tmp[2] = '\n';
@@ -293,6 +334,44 @@ void GetDate()
 	PCF8563_SetTime(&czas);
 
 }
+
+
+
+void SendHTMLCode( void )
+{
+	//czy tu powinna byc komenda AT+CIPSEND=0,<ile bajtow> by zadzia³a³o?
+	//uart_puts("AT+CIPSERVER=1,80");
+	//_delay_ms(250);
+	//PORTA ^= (1 << PA7);
+	_delay_ms(250);
+	uart_puts("AT+CIPSEND=0,44\r\n");
+	//PORTA ^= (1 << PA7);
+	_delay_ms(250);
+	//SendHTTP200Ok();
+	SendPageBody();
+	_delay_ms(750);
+	//PORTA ^= (1 << PA7);
+	uart_puts("AT+CIPCLOSE=0\r\n");
+	_delay_ms(250);
+	uart_puts("AT+CIPCLOSE=0\r\n");
+	//PORTA ^= (1 << PA7);
+	//zamkniêcie po³¹czenia komend¹ AT+CIPCLOSE ??
+}
+
+void SendPageBody( void )
+{
+	//45znakow
+	uart_puts_P( PSTR("<html><body>Hello World ")); //37
+	uart_putint(subzero, 10);
+	uart_putint(cel, 10);
+	uart_puts_P( PSTR(","));
+	uart_putint(cel_fract_bits, 10);
+	//uart_puts_P( PSTR("<html><body>Hello World\n\r") );
+	//uart_putint(counter++, 20);
+	uart_puts_P( PSTR("</body></html>\r\n") );
+}
+
+
 
 void ini_enkoder(){
 	EICRA |= (1 << ISC01);

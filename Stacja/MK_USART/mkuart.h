@@ -21,7 +21,7 @@
 #define UART_DE_NADAWANIE  UART_DE_PORT |= UART_DE_BIT
 
 
-#define UART_RX_BUF_SIZE 512 // definiujemy bufor o rozmiarze 32 bajtów
+#define UART_RX_BUF_SIZE 1024 // definiujemy bufor o rozmiarze 32 bajtów
 // definiujemy maskê dla naszego bufora
 #define UART_RX_BUF_MASK ( UART_RX_BUF_SIZE - 1)
 
