@@ -97,7 +97,7 @@ int main(void){
 	search_sensors();
 
 	USART_Init( __UBRR );
-	register_uart_str_rx_event_callback(Parse);
+	register_uart_str_rx_event_callback( Parse );
 	//uart_puts("AT+CWJAP=\"p205a\",\"426312638\"\r\n");
 
 	//ini_esp8266();
@@ -111,7 +111,7 @@ int main(void){
 		UART_RX_STR_EVENT( buff );
 
 		//---------------------------------------------------------------
-		for(int i = 3; i < 512; i++)
+	/*	for(int i = 3; i < 512; i++)
 					{
 						if(buff[i-3] == 'G' && buff[i-2] == 'E' && buff[i-1] == 'T' )
 						{
@@ -119,26 +119,26 @@ int main(void){
 							SendHTMLCode();
 							break;
 						}
-					}
+					}*/
 		//---------------------------------------------------------------
 		if(licznik2 >= 150){
-			SendAt("AT+CIPSERVER=0");
-			_delay_ms(50);
+			/*SendAt("AT+CIPSERVER=0");
+			_delay_ms(500);
 			SendAt("AT+CIPMUX=0");
-			_delay_ms(50);
+			_delay_ms(500);
 			SendAt("AT+CIPSTART=\"TCP\",\"www.onet.pl\",80");
-			_delay_ms(200);
+			_delay_ms(2000);
 			SendAt("AT+CIPSEND=4");
 			_delay_ms(25);
 			SendAt("aa");
-			_delay_ms(100);
-			//GetDate();
+			_delay_ms(1000);
+
 			//SendAt("AT+CIPCLOSE");
-			_delay_ms(50);
+			_delay_ms(500);
 			SendAt("AT+CIPMUX=1");
-			_delay_ms(50);
+			_delay_ms(500);
 			SendAt("AT+CIPSERVER=1,80");
-			_delay_ms(50);
+			_delay_ms(500);*/
 			PCF8563_GetTime(&czas);
 			lcd_gotoxy(0,0);
 			bcd2ASCII(czas.Hour, tekst);
@@ -226,18 +226,19 @@ void TakeMeasurement() {
 
 void ini_esp8266(){
 
-	uart_puts("AT+CWJAP=\"p205a\",\"426312638\"\r\n");
+	//uart_puts("AT+CWJAP=\"p205a\",\"426312638\"\r\n");
 	//uart_puts("at\r\n");
 
 }
 
 void Parse(char *buff )
 {
+	uart_puts( buff );
 	if(!strncmp("CONNECT", buff,7) || !strncmp("ALREADY CONNECTED", buff, 17))
 	{
 		SendAt("AT+CIPSEND=1");
 		_delay_ms(250);
-		SendAt("a");
+		//SendAt("a");
 	}
 
 	/*if(!strncmp("OK\n> ", buff, 5))
@@ -250,7 +251,7 @@ void Parse(char *buff )
 	if(!strncmp("Date: ", buff,6))
 	{
 		PORTA ^= (1 << PA7);
-		//GetDate();
+		GetDate();
 	}
 
 	/*if(!strncmp("ALREADY CONNECTED", buff, 5))
@@ -282,7 +283,7 @@ void SendAt(char* command)
 
 void GetDate()
 {
-
+	PORTA ^= (1<<PA7);
 	//uart_putc('\n');
 	for(int i = 5; i < 512; i++)
 		{
@@ -331,7 +332,9 @@ void GetDate()
 	czas.Minute=bin2bcd(m);
 	czas.Hour=bin2bcd(h);
 
+	PORTA ^= (1<<PA7);
 	PCF8563_SetTime(&czas);
+	PORTA ^= (1<<PA7);
 
 }
 
